@@ -1,6 +1,4 @@
-.Y1 .X1 {
-  background-color: black;
-}
+
 .row {
   min-width: 800px;
 }
@@ -17,7 +15,7 @@
 }
 
 .black {
-  background-color: black;
+  background-color: lightgrey;
 }
 .container {
   border-width: 1px;
@@ -30,6 +28,7 @@
   margin-top: 20px;
   padding-right: 30px;
 }
-body {
-  background-color: lightgrey;
+
+body{
+  font-size: 4.2em;
 }

@@ -1,3 +1,4 @@
+//business logic
 function Piece(player, type, value) {
   this.player = player;
   this.type = type;
@@ -20,12 +21,12 @@ function createPieces() {
   var bb1 = new Piece("B", "B", "3")
   var bb1pos = new Position(3,8);
   bb1.position.push(bb1pos);
-  var bk = new Piece("B", "K", "6")
-  var bkpos = new Position(4,8);
-  bk.position.push(bkpos);
-  var bq = new Piece("B", "Q", "5")
-  var bqpos = new Position(5,8);
+  var bq = new Piece("B", "Q", "6")
+  var bqpos = new Position(4,8);
   bq.position.push(bqpos);
+  var bk = new Piece("B", "K", "5")
+  var bkpos = new Position(5,8);
+  bk.position.push(bkpos);
   var bb2 = new Piece("B", "B", "3")
   var bb2pos = new Position(6,8);
   bb2.position.push(bb2pos);
@@ -46,12 +47,12 @@ function createPieces() {
   var wb1 = new Piece("W", "B", "3")
   var wb1pos = new Position(3,1);
   wb1.position.push(wb1pos);
-  var wk = new Piece("W", "K", "6")
-  var wkpos = new Position(4,1);
-  wk.position.push(wkpos);
-  var wq = new Piece("W", "Q", "5")
-  var wqpos = new Position(5,1);
+  var wq = new Piece("W", "Q", "6")
+  var wqpos = new Position(4,1);
   wq.position.push(wqpos);
+  var wk = new Piece("W", "K", "5")
+  var wkpos = new Position(5,1);
+  wk.position.push(wkpos);
   var wb2 = new Piece("W", "B", "3")
   var wb2pos = new Position(6,1);
   wb2.position.push(wb2pos);
@@ -73,7 +74,87 @@ pieces.push(br1, bn1, bb1, bk, bq, bb2, bn2, br2, wr1, wn1, wb1, wk, wq, wb2, wn
   }
 }
 
+function unicode(piece){
+  if (piece.type == "P" && piece.player == "B"){
+    return "&#9823;"
+  }
+  if (piece.type == "B" && piece.player == "B"){
+    return "&#9821;"
+  }
+  if (piece.type == "N" && piece.player == "B"){
+    return "&#9822;"
+  }
+  if (piece.type == "K" && piece.player == "B"){
+    return "&#9818;"
+  }
+  if (piece.type == "Q" && piece.player == "B"){
+    return "&#9819;"
+  }
+  if (piece.type == "R" && piece.player == "B"){
+    return "&#9820;"
+  }
+  if (piece.type == "P" && piece.player == "W"){
+    return "&#9817;"
+  }
+  if (piece.type == "B" && piece.player == "W"){
+    return "&#9815;"
+  }
+  if (piece.type == "N" && piece.player == "W"){
+    return "&#9816;"
+  }
+  if (piece.type == "K" && piece.player == "W"){
+    return "&#9812;"
+  }
+  if (piece.type == "Q" && piece.player == "W"){
+    return "&#9813;"
+  }
+  if (piece.type == "R" && piece.player == "W"){
+    return "&#9814;"
+  }
+}
+//ui logic
+function display(){
+  pieces.forEach(function(piece){
+  var posYObj = piece.position[0]
+  var posY = ".Y" + posYObj.y
+  var posXObj = piece.position[0]
+  var posX = "X" + posXObj.x
+  var symbol = unicode(piece)
+  $(posY + posX).append(symbol)
+})
+}
+function playerReady(){
+for(i=1;i<9;i++){
+  for(j=1;j<9;j++){
+    var pos = ".Y" + i + "X" + j;
+    $(pos).click(function(){
+      console.log(this);
+      console.log(pos + " 1");
+      for(i=1;i<9;i++){
+        for(j=1;j<9;j++){
+          var pos = ".Y" + i + "X" + j;
+      // if theres no piece exit function
+      // if theres a piece of current player color, wait for next click.
+      $(pos).click(function(){
+        console.log(pos + "2");
+        // check to see if legal move using function
+        // if space contains other player piece, move that piece to graveyard
+        // reset position value to i,j
+        // run display function
+        // switch active player
+      })
+    }
+  }
+    })
+  }
+}
+}
 $(document).ready(function(){
   createPieces()
+  display()
+playerReady()
+
+
+
   console.log(pieces);
 })
