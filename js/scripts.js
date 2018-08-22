@@ -123,38 +123,72 @@ function display(){
   $(posY + posX).append(symbol)
 })
 }
-function playerReady(){
-for(i=1;i<9;i++){
-  for(j=1;j<9;j++){
-    var pos = ".Y" + i + "X" + j;
-    $(pos).click(function(){
-      console.log(this);
-      console.log(pos + " 1");
-      for(i=1;i<9;i++){
-        for(j=1;j<9;j++){
-          var pos = ".Y" + i + "X" + j;
+
+function firstClick(pos){
+  if (pos.outerHTML.charCodeAt( 37 ) > 255) {
+    return 1;
+  } else {
+    return 0
+  }
+}
+
+
+
+function pieceChecker(pos) {
+
+  var posArray = pos.split("")
+  var y = posArray[1]
+  var x = posArray[3]
+  var result = {}
+  pieces.forEach(function(piece){
+  var posYObj = piece.position[0]
+  var posY = posYObj.y
+  var posXObj = piece.position[0]
+  var posX = posXObj.x
+  if (posX == x && posY == y){
+    result = piece
+  }
+})
+return result
+}
+function secondClick(clickOnePos, clickTwoPos){
+
+  pieceChecker())
+
+  // isLegalMove
+  // does it capture?
+  // change position of piece object
+}
+
       // if theres no piece exit function
       // if theres a piece of current player color, wait for next click.
-      $(pos).click(function(){
-        console.log(pos + "2");
-        // check to see if legal move using function
-        // if space contains other player piece, move that piece to graveyard
-        // reset position value to i,j
-        // run display function
-        // switch active player
-      })
-    }
-  }
-    })
-  }
-}
-}
+
+// $(pos).click(function(){
+//   console.log(pos + "2");
+//   // check to see if legal move using function
+//   // if space contains other player piece, move that piece to graveyard
+//   // reset position value to i,j
+//   // run display function
+//   // switch active player
 $(document).ready(function(){
   createPieces()
   display()
-playerReady()
+  var turn = 0;
 
+  for(i=1;i<9;i++){
+    for(j=1;j<9;j++){
+      var pos = ".Y" + i + "X" + j;
+      $(pos).click(function(){
+          if (turn == 0){
+            clickOnePos = this.outerHTML.slice(16,20) //modify
+            turn += firstClick(this);
+          } else if (turn == 1){
+            clickTwoPos = this.outerHTML.slice(16,20) //modify
+            secondClick(clickOnePos, clickTwoPos)
+            turn --;
+        }
 
-
-  console.log(pieces);
+})
+}
+}
 })
