@@ -1,0 +1,35 @@
+.Y1 .X1 {
+  background-color: black;
+}
+.row {
+  min-width: 800px;
+}
+
+
+
+.col {
+  width: 100px;
+  height: 100px;
+  max-width: 100px;
+  max-height: 100px;
+  min-width: 100px;
+  min-height: 100px;
+}
+
+.black {
+  background-color: black;
+}
+.container {
+  border-width: 1px;
+  border-color: black;
+  border-style: solid;
+  min-width: 802px;
+  max-width: 802px;
+  min-height: 802px;
+  max-height: 802px;
+  margin-top: 20px;
+  padding-right: 30px;
+}
+body {
+  background-color: lightgrey;
+}
