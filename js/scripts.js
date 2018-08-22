@@ -114,18 +114,26 @@ function unicode(piece){
 }
 //ui logic
 function display(){
+  $(".col").empty()
+  $(".graveyard").empty()
+
   pieces.forEach(function(piece){
   var posYObj = piece.position[0]
   var posY = ".Y" + posYObj.y
   var posXObj = piece.position[0]
   var posX = "X" + posXObj.x
   var symbol = unicode(piece)
+  console.log(posYObj.y);
+  if (posYObj.y === 0){
+    $(".graveyard").append(symbol)
+  } else {
   $(posY + posX).append(symbol)
+}
 })
 }
 
 function firstClick(pos){
-  if (pos.outerHTML.charCodeAt( 37 ) > 255) {
+  if (pos.outerHTML.charCodeAt( 28 ) > 255) {
     return 1;
   } else {
     return 0
@@ -139,7 +147,7 @@ function pieceChecker(pos) {
   var posArray = pos.split("")
   var y = posArray[1]
   var x = posArray[3]
-  var result = {}
+  var result = 0
   pieces.forEach(function(piece){
   var posYObj = piece.position[0]
   var posY = posYObj.y
@@ -153,7 +161,19 @@ return result
 }
 function secondClick(clickOnePos, clickTwoPos){
 
-  pieceChecker())
+  var clickedPiece = pieceChecker(clickOnePos)
+  var twoPosArray = clickTwoPos.split("")
+  var y = twoPosArray[1]
+  var x = twoPosArray[3]
+  console.log(pieceChecker(clickTwoPos)+"piecechecker");
+  if (pieceChecker(clickTwoPos) != 0){
+  var deadPiece = pieceChecker(clickTwoPos)
+  deadPiece.position[0] = new Position(0,0)
+}
+  clickedPiece.position[0] = new Position(x,y)
+
+  display();
+
 
   // isLegalMove
   // does it capture?
@@ -179,10 +199,13 @@ $(document).ready(function(){
     for(j=1;j<9;j++){
       var pos = ".Y" + i + "X" + j;
       $(pos).click(function(){
+        console.log(this.outerHTML);
           if (turn == 0){
-            clickOnePos = this.outerHTML.slice(16,20) //modify
+            clickOnePos = this.outerHTML.slice(16,20)
+            console.log("first"); //modify
             turn += firstClick(this);
           } else if (turn == 1){
+            console.log("second");
             clickTwoPos = this.outerHTML.slice(16,20) //modify
             secondClick(clickOnePos, clickTwoPos)
             turn --;
