@@ -1,9 +1,43 @@
+//
+// function forcedCapture(playerTurn){
+//     var possibleMoves = []
+//     var forcedCaptureMoves = []
+//     var capturedPiece = {}
+//     // check pawns
+//     pieces.forEach(function(piece){
+//     if (piece.player == playerTurn){
+//       if (piece.type == "P"){
+//         var polarity = 1
+//         if (piece.player == "B"){
+//           polarity = -1
+//         }
+//         var pos = piece.position[0]
+//         var oneX = pos.x
+//         var oneY = pos.y
+//
+//         possibleMoves.push(oneX, oneY+(polarity))
+//         if (piece.player == "B" && oneY == 7 || piece.player == "W" && oneY == 2){
+//           possibleMoves.push(oneX, oneY+(polarity*2))
+//         }
+//       }
+//     }
+//     })
+//     for (i=0; i<possibleMoves.length; i+=2) {
+//       capturedPiece = pieceChecker(0, possibleMoves[i], possibleMoves[i+1])
+//       if (capturedPiece != 0 && capturedPiece.player != playerTurn){
+//         forcedCaptureMoves.push(possibleMoves[i], possibleMoves[i+1])
+//       }
+//     }
+//     return forcedCaptureMoves
+// }
+
+
 //business logic
 function Piece(player, type, value) {
   this.player = player;
   this.type = type;
   this.value = value;
-  this.position = []
+  this.position = [] //fix this someday
 }
 
 function Position(x,y) {
@@ -12,6 +46,7 @@ function Position(x,y) {
 }
 var pieces = []
 function createPieces() {
+  //create arrays to feed into loop which creates objects
   var br1 = new Piece("B", "R", "4")
   var br1pos = new Position(1,8);
   br1.position.push(br1pos);
@@ -75,6 +110,7 @@ function createPieces() {
 }
 
 function unicode(piece){
+  //potentially add to object
   if (piece.type == "P" && piece.player == "B"){
     return "&#9823;"
   }
@@ -113,35 +149,6 @@ function unicode(piece){
   }
 }
 
-//ui logic
-
-function isLegalMove(OneX, OneY, TwoX, TwoY, piece, pieceTwo){
-  var oneY = parseInt(OneY)
-  var oneX = parseInt(OneX)
-  var twoY = parseInt(TwoY)
-  var twoX = parseInt(TwoX)
-  var possibleMoves = []
-  if (piece.type == "P"){
-    var polarity = 1
-    if (piece.player == "B"){
-      polarity = -1
-    }
-    possibleMoves.push(oneX, oneY+(polarity))
-    if (piece.player == "B" && oneY == 7 || piece.player == "W" && oneY == 2){
-      possibleMoves.push(oneX, oneY+(polarity*2))
-    }
-    if (pieceTwo !== 0 && twoX == ((oneX + 1)||(oneX - 1)) && twoY == oneY + polarity){
-      possibleMoves.push(twoX, twoY)
-    }
-  }
-for (i = 0; i < possibleMoves.length; i += 2){
-  if (possibleMoves[i] == twoX && possibleMoves[i+1] == twoY){
-    return true
-  }
-}
-  return false
-}
-
 function display(){
   $(".col").empty()
   $(".graveyard").empty()
@@ -159,6 +166,17 @@ function display(){
   })
 }
 
+//ui logic
+
+function firstClick(pos, playerTurn){
+
+  if (playerTurnCheck(pos, playerTurn)) {
+    return 1;
+  } else {
+    return 0
+  }
+}
+
 function playerTurnCheck(pos, playerTurn){
   var piece = pieceChecker(pos)
   if (piece.player == playerTurn) {
@@ -168,11 +186,17 @@ function playerTurnCheck(pos, playerTurn){
   }
 }
 
-function pieceChecker(pos) {
-
-  var posArray = pos.split("")
-  var y = posArray[1]
-  var x = posArray[3]
+function pieceChecker(pos, argumentX, argumentY) {
+  var x = 0
+  var y = 0
+  if (pos == 0){
+    y = argumentY
+    x = argumentX
+  } else {
+    var posArray = pos.split("")
+    y = posArray[1]
+    x = posArray[3]
+  }
   var result = 0
   pieces.forEach(function(piece){
     var posYObj = piece.position[0]
@@ -186,25 +210,8 @@ function pieceChecker(pos) {
   return result
 }
 
-function playerSwitch(player){
-  if (player == "W") {
-    return "B";
-  } else if (player == "B"){
-    return "W";
-  }
-}
+function secondClick(clickOnePos, clickTwoPos, playerTurn){
 
-function firstClick(pos, playerTurn){
-  if (playerTurnCheck(pos, playerTurn)) {
-    return 1;
-  } else {
-    return 0
-  }
-}
-
-function secondClick(clickOnePos, clickTwoPos){
-
-  // call islegalmove function pass in argument clicked piece
   var clickedPiece = pieceChecker(clickOnePos)
   var clickedPieceTwo = pieceChecker(clickTwoPos)
   var twoPosArray = clickTwoPos.split("")
@@ -214,20 +221,209 @@ function secondClick(clickOnePos, clickTwoPos){
   var oneY = onePosArray[1]
   var oneX = onePosArray[3]
 
-   if (isLegalMove(oneX,oneY,x,y,clickedPiece, clickedPieceTwo) == false){
-     return false
-   }
+  // var forcedCaptureMoves = forcedCapture(playerTurn)
+  // if (forcedCaptureMoves.length != 0){
+  //   for (i = 0; i < forcedCaptureMoves.length; i += 2){
+  //     if (forcedCaptureMoves[i] == x && forcedCaptureMoves[i+1] == y){
+  //       isLegalMove(oneX,oneY,x,y,clickedPiece, clickedPieceTwo, playerTurn)
+  //       var deadPiece = pieceChecker(clickTwoPos)
+  //       clickedPiece.position[0] = new Position(x,y)
+  //       deadPiece.position[0] = new Position(0,0)
+  //       return true
+  //     } else {
+  //       return false
+  //     }
+  //   }
+  // }
 
+  if (isLegalMove(oneX,oneY,x,y,clickedPiece, clickedPieceTwo, playerTurn) == false){
+    return false
+  }
   if (clickedPieceTwo != 0 && clickedPieceTwo.player !== clickedPiece.player){
     var deadPiece = pieceChecker(clickTwoPos)
     clickedPiece.position[0] = new Position(x,y)
     deadPiece.position[0] = new Position(0,0)
     return true
-  } else if (clickedPieceTwo.player === clickedPiece.player){
+  } else
+  if (clickedPieceTwo.player === clickedPiece.player){
     return false
   } else {
     clickedPiece.position[0] = new Position(x,y)
     return true
+  }
+}
+
+function isLegalMove(OneX, OneY, TwoX, TwoY, piece, pieceTwo, playerTurn){
+
+  var oneY = parseInt(OneY)
+  var oneX = parseInt(OneX)
+  var twoY = parseInt(TwoY)
+  var twoX = parseInt(TwoX)
+  var possibleMoves = []
+
+  if (piece.type == "P"){
+    var polarity = 1
+    if (piece.player == "B"){
+      polarity = -1
+    }
+    possibleMoves.push(oneX, oneY+(polarity))
+    if (piece.player == "B" && oneY == 7 || piece.player == "W" && oneY == 2){
+      possibleMoves.push(oneX, oneY+(polarity*2))
+    }
+    if (pieceTwo !== 0 && (twoX == (oneX + 1) || twoX == (oneX - 1)) && twoY == oneY + polarity){
+      possibleMoves.push(twoX, twoY)
+    }
+    if (pieceTwo !=0 && twoX == oneX && (twoY == oneY+polarity || twoY == oneY+(polarity*2))){
+      return false
+    }
+  }
+  if (piece.type == "K"){
+    possibleMoves.push(oneX + 1, oneY+1)
+    possibleMoves.push(oneX - 1, oneY+1)
+    possibleMoves.push(oneX + 1, oneY-1)
+    possibleMoves.push(oneX - 1, oneY-1)
+    possibleMoves.push(oneX, oneY+1)
+    possibleMoves.push(oneX + 1, oneY)
+    possibleMoves.push(oneX, oneY-1)
+    possibleMoves.push(oneX - 1, oneY)
+  }
+  if (piece.type == "N"){
+    possibleMoves.push(oneX + 2, oneY+1)
+    possibleMoves.push(oneX - 2, oneY+1)
+    possibleMoves.push(oneX + 2, oneY-1)
+    possibleMoves.push(oneX - 2, oneY-1)
+    possibleMoves.push(oneX + 1, oneY+2)
+    possibleMoves.push(oneX - 1, oneY+2)
+    possibleMoves.push(oneX + 1, oneY-2)
+    possibleMoves.push(oneX - 1, oneY-2)
+  }
+  if (piece.type == "R"){
+    for (i = 0; i<8; i++){
+      possibleMoves.push(oneX + i, oneY)
+      possibleMoves.push(oneX - i, oneY)
+      possibleMoves.push(oneX, oneY + i)
+      possibleMoves.push(oneX, oneY - i)
+    }
+
+  }
+  if (piece.type == "B"){
+    for (i = 0; i<8; i++){
+      possibleMoves.push(oneX + i, oneY + i)
+      possibleMoves.push(oneX - i, oneY + i)
+      possibleMoves.push(oneX - i, oneY - i)
+      possibleMoves.push(oneX + i, oneY - i)
+    }
+  }
+  if (piece.type == "Q"){
+    for (i = 0; i<8; i++){
+      possibleMoves.push(oneX + i, oneY+i)
+      possibleMoves.push(oneX - i, oneY+i)
+      possibleMoves.push(oneX + i, oneY-i)
+      possibleMoves.push(oneX - i, oneY-i)
+      possibleMoves.push(oneX, oneY+i)
+      possibleMoves.push(oneX + i, oneY)
+      possibleMoves.push(oneX, oneY-i)
+      possibleMoves.push(oneX - i, oneY)
+    }
+  }
+  for (i = 0; i < possibleMoves.length; i += 2){
+    var k = 1
+    if (possibleMoves[i] == twoX && possibleMoves[i+1] == twoY){
+      if (piece.type == "R" || piece.type == "Q" || piece.type == "P"){
+        if (oneX == twoX){
+          if (oneY > twoY){
+            k = 1
+            while (oneY-k !== twoY){
+              if (pieceChecker(0, oneX, oneY-k)){
+                return false
+              }
+              k++
+            }
+          }
+        }
+        if (oneX == twoX){
+          if (oneY < twoY){
+            k = 1
+            while (oneY+k !== twoY){
+              if (pieceChecker(0, oneX, oneY+k)){
+                return false
+              }
+              k++
+            }
+          }
+        }
+        if (oneY == twoY){
+          if (oneX > twoX){
+            k = 1
+            while (oneX-k !== twoX){
+              if (pieceChecker(0, oneX-k, oneY)){
+                return false
+              }
+              k++
+            }
+          }
+        }
+        if (oneY == twoY){
+          if (oneX < twoX){
+            k = 1
+            while (oneX+k !== twoX){
+              if (pieceChecker(0, oneX+k, oneY)){
+                return false
+              }
+              k++
+            }
+          }
+        }
+      }
+      if (piece.type == "B" || piece.type == "Q"){
+        if(oneY > twoY && oneX > twoX){
+          k = 1
+          while (oneX-k != twoX && oneY-k != twoY){
+            if (pieceChecker(0, oneX-k, oneY-k)){
+              return false
+            }
+            k++
+          }
+        }
+        if(oneY < twoY && oneX > twoX){
+          k = 1
+          while (oneX-k != twoX && oneY+k != twoY){
+            if (pieceChecker(0, oneX-k, oneY+k)){
+              return false
+            }
+            k++
+          }
+        }
+        if(oneY > twoY && oneX < twoX){
+          k = 1
+          while (oneX+k != twoX && oneY-k != twoY){
+            if (pieceChecker(0, oneX+k, oneY-k)){
+              return false
+            }
+            k++
+          }
+        }
+        if(oneY < twoY && oneX < twoX){
+          k = 1
+          while (oneX+k != twoX && oneY+k != twoY){
+            if (pieceChecker(0, oneX+k, oneY+k)){
+              return false
+            }
+            k++
+          }
+        }
+      }
+      return true
+    }
+  }
+  return false
+}
+
+function playerSwitch(player){
+  if (player == "W") {
+    return "B";
+  } else if (player == "B"){
+    return "W";
   }
 }
 
@@ -241,20 +437,20 @@ $(document).ready(function(){
     for(j=1;j<9;j++){
       var pos = ".Y" + i + "X" + j;
       $(pos).click(function(){
-
         if (turn == 0){
           clickOnePos = this.outerHTML.slice(16,20)
-
           turn += firstClick(this.outerHTML.slice(16,20), playerTurn);
         } else if (turn == 1){
-
           clickTwoPos = this.outerHTML.slice(16,20) //modify
-          var noFriendlyFire = secondClick(clickOnePos, clickTwoPos)
+          var noFriendlyFire = secondClick(clickOnePos, clickTwoPos, playerTurn)
           if (noFriendlyFire){
             playerTurn = playerSwitch(playerTurn);
             turn --;
+            display()
+            return
           }
           display()
+          turn --;
         }
       })
     }
