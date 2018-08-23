@@ -62,7 +62,7 @@ function createPieces() {
   var wr2 = new Piece("W", "R", "4")
   var wr2pos = new Position(8,1);
   wr2.position.push(wr2pos);
-pieces.push(br1, bn1, bb1, bk, bq, bb2, bn2, br2, wr1, wn1, wb1, wk, wq, wb2, wn2, wr2)
+  pieces.push(br1, bn1, bb1, bk, bq, bb2, bn2, br2, wr1, wn1, wb1, wk, wq, wb2, wn2, wr2)
   for (i=0;i<8; i++){
     var bp = new Piece("B", "P", "1")
     var bppos = new Position(i+1,7);
@@ -112,35 +112,61 @@ function unicode(piece){
     return "&#9814;"
   }
 }
+
 //ui logic
+
+function isLegalMove(OneX, OneY, TwoX, TwoY, piece, pieceTwo){
+  var oneY = parseInt(OneY)
+  var oneX = parseInt(OneX)
+  var twoY = parseInt(TwoY)
+  var twoX = parseInt(TwoX)
+  var possibleMoves = []
+  if (piece.type == "P"){
+    var polarity = 1
+    if (piece.player == "B"){
+      polarity = -1
+    }
+    possibleMoves.push(oneX, oneY+(polarity))
+    if (piece.player == "B" && oneY == 7 || piece.player == "W" && oneY == 2){
+      possibleMoves.push(oneX, oneY+(polarity*2))
+    }
+    if (pieceTwo !== 0 && twoX == ((oneX + 1)||(oneX - 1)) && twoY == oneY + polarity){
+      possibleMoves.push(twoX, twoY)
+    }
+  }
+for (i = 0; i < possibleMoves.length; i += 2){
+  if (possibleMoves[i] == twoX && possibleMoves[i+1] == twoY){
+    return true
+  }
+}
+  return false
+}
+
 function display(){
   $(".col").empty()
   $(".graveyard").empty()
-
   pieces.forEach(function(piece){
-  var posYObj = piece.position[0]
-  var posY = ".Y" + posYObj.y
-  var posXObj = piece.position[0]
-  var posX = "X" + posXObj.x
-  var symbol = unicode(piece)
-  console.log(posYObj.y);
-  if (posYObj.y === 0){
-    $(".graveyard").append(symbol)
-  } else {
-  $(posY + posX).append(symbol)
-}
-})
+    var posYObj = piece.position[0]
+    var posY = ".Y" + posYObj.y
+    var posXObj = piece.position[0]
+    var posX = "X" + posXObj.x
+    var symbol = unicode(piece)
+    if (posYObj.y === 0){
+      $(".graveyard").append(symbol)
+    } else {
+      $(posY + posX).append(symbol)
+    }
+  })
 }
 
-function firstClick(pos){
-  if (pos.outerHTML.charCodeAt( 28 ) > 255) {
-    return 1;
+function playerTurnCheck(pos, playerTurn){
+  var piece = pieceChecker(pos)
+  if (piece.player == playerTurn) {
+    return true
   } else {
-    return 0
+    return false
   }
 }
-
-
 
 function pieceChecker(pos) {
 
@@ -149,69 +175,88 @@ function pieceChecker(pos) {
   var x = posArray[3]
   var result = 0
   pieces.forEach(function(piece){
-  var posYObj = piece.position[0]
-  var posY = posYObj.y
-  var posXObj = piece.position[0]
-  var posX = posXObj.x
-  if (posX == x && posY == y){
-    result = piece
-  }
-})
-return result
+    var posYObj = piece.position[0]
+    var posY = posYObj.y
+    var posXObj = piece.position[0]
+    var posX = posXObj.x
+    if (posX == x && posY == y){
+      result = piece
+    }
+  })
+  return result
 }
+
+function playerSwitch(player){
+  if (player == "W") {
+    return "B";
+  } else if (player == "B"){
+    return "W";
+  }
+}
+
+function firstClick(pos, playerTurn){
+  if (playerTurnCheck(pos, playerTurn)) {
+    return 1;
+  } else {
+    return 0
+  }
+}
+
 function secondClick(clickOnePos, clickTwoPos){
 
+  // call islegalmove function pass in argument clicked piece
   var clickedPiece = pieceChecker(clickOnePos)
+  var clickedPieceTwo = pieceChecker(clickTwoPos)
   var twoPosArray = clickTwoPos.split("")
   var y = twoPosArray[1]
   var x = twoPosArray[3]
-  console.log(pieceChecker(clickTwoPos)+"piecechecker");
-  if (pieceChecker(clickTwoPos) != 0){
-  var deadPiece = pieceChecker(clickTwoPos)
-  deadPiece.position[0] = new Position(0,0)
+  var onePosArray = clickOnePos.split("")
+  var oneY = onePosArray[1]
+  var oneX = onePosArray[3]
+
+   if (isLegalMove(oneX,oneY,x,y,clickedPiece, clickedPieceTwo) == false){
+     return false
+   }
+
+  if (clickedPieceTwo != 0 && clickedPieceTwo.player !== clickedPiece.player){
+    var deadPiece = pieceChecker(clickTwoPos)
+    clickedPiece.position[0] = new Position(x,y)
+    deadPiece.position[0] = new Position(0,0)
+    return true
+  } else if (clickedPieceTwo.player === clickedPiece.player){
+    return false
+  } else {
+    clickedPiece.position[0] = new Position(x,y)
+    return true
+  }
 }
-  clickedPiece.position[0] = new Position(x,y)
 
-  display();
-
-
-  // isLegalMove
-  // does it capture?
-  // change position of piece object
-}
-
-      // if theres no piece exit function
-      // if theres a piece of current player color, wait for next click.
-
-// $(pos).click(function(){
-//   console.log(pos + "2");
-//   // check to see if legal move using function
-//   // if space contains other player piece, move that piece to graveyard
-//   // reset position value to i,j
-//   // run display function
-//   // switch active player
 $(document).ready(function(){
   createPieces()
   display()
   var turn = 0;
+  var playerTurn = "W"
 
   for(i=1;i<9;i++){
     for(j=1;j<9;j++){
       var pos = ".Y" + i + "X" + j;
       $(pos).click(function(){
-        console.log(this.outerHTML);
-          if (turn == 0){
-            clickOnePos = this.outerHTML.slice(16,20)
-            console.log("first"); //modify
-            turn += firstClick(this);
-          } else if (turn == 1){
-            console.log("second");
-            clickTwoPos = this.outerHTML.slice(16,20) //modify
-            secondClick(clickOnePos, clickTwoPos)
-            turn --;
-        }
 
-})
-}
-}
+        if (turn == 0){
+          clickOnePos = this.outerHTML.slice(16,20)
+
+          turn += firstClick(this.outerHTML.slice(16,20), playerTurn);
+        } else if (turn == 1){
+
+          clickTwoPos = this.outerHTML.slice(16,20) //modify
+          var noFriendlyFire = secondClick(clickOnePos, clickTwoPos)
+          if (noFriendlyFire){
+            playerTurn = playerSwitch(playerTurn);
+            turn --;
+          }
+          display()
+        }
+      })
+    }
+  }
 })
